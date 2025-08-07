@@ -33,6 +33,7 @@ public class Function1
     private async Task<string> CallApi()
     {
         string baseUrl = configuration.GetValue<string>("AUTHTESTSERVER_BASE_URL")!;
+        _logger.LogInformation("Calling through to " + baseUrl);
         var client = new HttpClient();
         var request = new HttpRequestMessage
         {
