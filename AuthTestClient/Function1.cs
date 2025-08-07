@@ -1,3 +1,5 @@
+using DarkLoop.Azure.Functions.Authorization;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.Functions.Worker;
@@ -5,6 +7,7 @@ using Microsoft.Extensions.Logging;
 
 namespace AuthTestClient;
 
+[FunctionAuthorize]
 public class Function1
 {
     private readonly ILogger<Function1> _logger;
@@ -14,6 +17,7 @@ public class Function1
         _logger = logger;
     }
 
+    [Authorize]
     [Function("Function1")]
     public IActionResult Run([HttpTrigger(AuthorizationLevel.Anonymous, "get", "post")] HttpRequest req)
     {
