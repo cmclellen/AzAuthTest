@@ -1,12 +1,10 @@
-using DarkLoop.Azure.Functions.Authorization;
-using Microsoft.AspNetCore.Authorization;
+using Azure.Core;
+using Azure.Identity;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
-using System.Configuration;
-using System.Runtime.CompilerServices;
 
 namespace AuthTestClient;
 
@@ -32,6 +30,8 @@ public class Function1
 
     private async Task<string> CallApi()
     {
+        var token = await GetToken();
+
         string baseUrl = configuration.GetValue<string>("AUTHTESTSERVER_BASE_URL")!;
         _logger.LogInformation("Calling through to " + baseUrl);
         var client = new HttpClient();
@@ -42,6 +42,7 @@ public class Function1
             Headers =
     {
         { "User-Agent", "insomnia/11.4.0" },
+          {"Authorization", $"Bearer ${token}" }
     },
         };
         using (var response = await client.SendAsync(request))
@@ -51,5 +52,17 @@ public class Function1
             Console.WriteLine(body);
             return body;
         }
+    }
+
+    private async Task<string> GetToken()
+    {
+        ManagedIdentityCredential miCredential = new ();
+        string miAudience = "api://AzureADTokenExchange";
+        TokenRequestContext tokenRequestContext = new([$"{miAudience}/.default"]);
+        var token = await miCredential.GetTokenAsync(tokenRequestContext);
+
+        _logger.LogInformation("Token: " + token);
+        return token.Token;
+
     }
 }
