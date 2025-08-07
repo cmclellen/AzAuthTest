@@ -7,8 +7,8 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="DarkLoop.Azure.Functions.Authorization.Isolated" Version="4.2.0" />
-    <PackageReference Include="Microsoft.Azure.Functions.Worker" Version="2.0.0" />
+    <PackageReference Include="DarkLoop.Azure.Functions.Authorization.Isolated"/>
+    <PackageReference Include="Microsoft.Azure.Functions.Worker" />
   </ItemGroup>
 
 </Project>
