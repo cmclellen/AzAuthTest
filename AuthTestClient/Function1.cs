@@ -3,7 +3,9 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.Functions.Worker;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
+using System.Configuration;
 using System.Runtime.CompilerServices;
 
 namespace AuthTestClient;
@@ -11,10 +13,12 @@ namespace AuthTestClient;
 public class Function1
 {
     private readonly ILogger<Function1> _logger;
+    private readonly IConfiguration configuration;
 
-    public Function1(ILogger<Function1> logger)
+    public Function1(ILogger<Function1> logger, IConfiguration configuration)
     {
         _logger = logger;
+        this.configuration = configuration;
     }
 
     [Function("Function1")]
@@ -28,11 +32,12 @@ public class Function1
 
     private async Task<string> CallApi()
     {
+        string baseUrl = configuration.GetValue<string>("AUTHTESTSERVER_BASE_URL")!;
         var client = new HttpClient();
         var request = new HttpRequestMessage
         {
             Method = HttpMethod.Get,
-            RequestUri = new Uri("https://authtestserver-hsgbf2b3aehadjbq.australiaeast-01.azurewebsites.net/api/Function1"),
+            RequestUri = new Uri($"{baseUrl}api/Function1"),
             Headers =
     {
         { "User-Agent", "insomnia/11.4.0" },
