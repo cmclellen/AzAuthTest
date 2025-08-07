@@ -22,6 +22,7 @@ public class Function1
     [Function("Function1")]
     public async Task<IActionResult> Run([HttpTrigger(AuthorizationLevel.Anonymous, "get", "post")] HttpRequest req)
     {
+        _logger.LogInformation("Running...");
         var response = await CallApi();
 
         _logger.LogInformation("Craig says....C# HTTP trigger function processed a request.");
@@ -33,7 +34,7 @@ public class Function1
         var token = await GetToken();
 
         string baseUrl = configuration.GetValue<string>("AUTHTESTSERVER_BASE_URL")!;
-        _logger.LogInformation("Calling through to " + baseUrl);
+        _logger.LogInformation("Calling through to {BaseUrl}", baseUrl);
         var client = new HttpClient();
         var request = new HttpRequestMessage
         {
@@ -56,12 +57,12 @@ public class Function1
 
     private async Task<string> GetToken()
     {
+        _logger.LogInformation("Obtaining token...");
         ManagedIdentityCredential miCredential = new ();
         string miAudience = "api://AzureADTokenExchange";
         TokenRequestContext tokenRequestContext = new([$"{miAudience}/.default"]);
         var token = await miCredential.GetTokenAsync(tokenRequestContext);
-
-        _logger.LogInformation("Token: " + token);
+        _logger.LogInformation("Token obtained {Token}", token);
         return token.Token;
 
     }

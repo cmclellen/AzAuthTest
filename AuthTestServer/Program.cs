@@ -6,6 +6,8 @@ using Microsoft.Extensions.Hosting;
 
 var builder = FunctionsApplication.CreateBuilder(args);
 
+builder.ConfigureLogging();
+
 builder.ConfigureFunctionsWebApplication()
     .ConfigureAuth();
 

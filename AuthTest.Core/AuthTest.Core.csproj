@@ -7,8 +7,12 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="DarkLoop.Azure.Functions.Authorization.Isolated"/>
+    <PackageReference Include="DarkLoop.Azure.Functions.Authorization.Isolated" />
     <PackageReference Include="Microsoft.Azure.Functions.Worker" />
+    <PackageReference Include="Serilog" />
+    <PackageReference Include="Serilog.Extensions.Logging" />
+    <PackageReference Include="Serilog.Sinks.ApplicationInsights" />
+    <PackageReference Include="Serilog.Sinks.Console" />
   </ItemGroup>
 
 </Project>

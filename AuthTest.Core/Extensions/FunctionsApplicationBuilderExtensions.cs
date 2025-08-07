@@ -3,11 +3,8 @@ using Microsoft.Azure.Functions.Worker;
 using Microsoft.Azure.Functions.Worker.Builder;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
+using Serilog;
 
 namespace AuthTest.Core.Extensions
 {
@@ -31,6 +28,27 @@ namespace AuthTest.Core.Extensions
                 });
 
             return builder;
+        }
+
+        public static void ConfigureLogging(this FunctionsApplicationBuilder builder) {
+            // Read Application Insights connection string from configuration
+            string? appInsightsConnectionString = builder.Configuration["APPLICATIONINSIGHTS_CONNECTION_STRING"];
+
+            // Configure Serilog to log to both Console and Application Insights
+            Log.Logger = new LoggerConfiguration()
+                .MinimumLevel.Information()
+                .WriteTo.Console()
+                .WriteTo.ApplicationInsights(
+                    appInsightsConnectionString,
+                    TelemetryConverter.Traces)
+                .CreateLogger();
+
+            // Register Serilog as the logging provider
+            builder.Services.AddLogging(loggingBuilder =>
+            {
+                loggingBuilder.ClearProviders();
+                loggingBuilder.AddSerilog(dispose: true);
+            });
         }
     }
 }
