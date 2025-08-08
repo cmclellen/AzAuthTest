@@ -33,7 +33,7 @@ public class Function1
     {
         var token = await GetToken();
 
-        string baseUrl = configuration.GetValue<string>("AUTHTESTSERVER_BASE_URL")!;
+        var baseUrl = configuration.GetValue<string>("AUTHTESTSERVER_BASE_URL")!;
         _logger.LogInformation("Calling through to {BaseUrl}", baseUrl);
         var client = new HttpClient();
         var request = new HttpRequestMessage
@@ -41,29 +41,49 @@ public class Function1
             Method = HttpMethod.Get,
             RequestUri = new Uri($"{baseUrl}api/Function1"),
             Headers =
-    {
-        { "User-Agent", "insomnia/11.4.0" },
-          {"Authorization", $"Bearer ${token}" }
-    },
+            {
+                { "Authorization", $"Bearer ${token}" }
+            }
         };
-        using (var response = await client.SendAsync(request))
-        {
-            response.EnsureSuccessStatusCode();
-            var body = await response.Content.ReadAsStringAsync();
-            Console.WriteLine(body);
-            return body;
-        }
+
+        using var response = await client.SendAsync(request);
+        response.EnsureSuccessStatusCode();
+        var body = await response.Content.ReadAsStringAsync();
+        Console.WriteLine(body);
+        return body;
     }
 
     private async Task<string> GetToken()
     {
         _logger.LogInformation("Obtaining token...");
-        ManagedIdentityCredential miCredential = new ();
-        string miAudience = "api://AzureADTokenExchange";
-        TokenRequestContext tokenRequestContext = new([$"{miAudience}/.default"]);
-        var token = await miCredential.GetTokenAsync(tokenRequestContext);
-        _logger.LogInformation("Token obtained {Token}", token);
-        return token.Token;
 
+        ManagedIdentityCredential miCredential = new();
+        var token = await miCredential.GetTokenAsync(GetTokenRequestContext());
+        _logger.LogInformation("Token obtained {Token}", token.Token);
+        return token.Token;
+    }
+
+    //private TokenRequestContext GetTokenRequestContext()
+    //{
+    //    var miAudience = "api://AzureADTokenExchange";
+    //    TokenRequestContext tokenRequestContext = new([$"{miAudience}/.default"]);
+    //    return tokenRequestContext;
+    //}
+
+    private TokenRequestContext GetTokenRequestContext()
+    {
+        try
+        {
+            var miAudience = configuration.GetValue<string>("MI_AUDIENCE")!;
+            var tokenRequestContextUri = $"{miAudience}/.default";
+            _logger.LogInformation("Constructed token request context [{TokenRequestContextUri}]", tokenRequestContextUri);
+            TokenRequestContext tokenRequestContext = new([tokenRequestContextUri]);
+            return tokenRequestContext;
+        }
+        catch (Exception e)
+        {
+            _logger.LogError(e, "Failed obtaining access token.");
+            throw;
+        }
     }
 }
