@@ -37,6 +37,7 @@ public class Function1
         var baseUrl = configuration.GetValue<string>("AUTHTESTSERVER_BASE_URL")!;
         _logger.LogInformation("Calling through to {BaseUrl}", baseUrl);
         var client = new HttpClient();
+        client.DefaultRequestHeaders.CacheControl = CacheControlHeaderValue.Parse("no-cache");
         client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
         var request = new HttpRequestMessage
         {
@@ -54,7 +55,8 @@ public class Function1
     {
         _logger.LogInformation("Obtaining token...");
 
-        DefaultAzureCredential credential = new();
+        //DefaultAzureCredential credential = new();
+        ManagedIdentityCredential credential = new();
         var token = await credential.GetTokenAsync(GetTokenRequestContext());
         _logger.LogInformation("Token obtained {Token}", token.Token);
         return token.Token;

@@ -1,0 +1,121 @@
+type: collection.insomnia.rest/5.0
+name: Scratch Pad
+meta:
+  id: wrk_scratchpad
+  created: 1754461010742
+  modified: 1754461010742
+  description: ""
+collection:
+  - name: HBGateway
+    meta:
+      id: fld_b6d5091027984bb799c179b0cb6aea9a
+      created: 1754462370626
+      modified: 1754462397798
+      sortKey: -1754462370626
+      description: ""
+  - name: Daily
+    meta:
+      id: fld_2e6457ec2b044d04a620c4c683a71edb
+      created: 1754462391066
+      modified: 1754462400654
+      sortKey: -1754462391066
+      description: ""
+  - name: Matching
+    meta:
+      id: fld_5ed8049147c74d3fa81177ea124f4587
+      created: 1754463164743
+      modified: 1754463164743
+      sortKey: -1754463164743
+      description: ""
+  - name: AuthTest
+    meta:
+      id: fld_ea785304c94b46d3804d137ff864406b
+      created: 1754540451778
+      modified: 1754540451778
+      sortKey: -1754540451778
+      description: ""
+    children:
+      - url: "{{AUTHTESTSERVER_BASE_API_URL}}api/Function1"
+        name: AuthTestServer
+        meta:
+          id: req_cd826ad9ecfc4ac1840e145260a21fc2
+          created: 1754540454442
+          modified: 1754541072728
+          isPrivate: false
+          description: ""
+          sortKey: -1754540454442
+        method: GET
+        headers:
+          - name: User-Agent
+            value: insomnia/11.4.0
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: "{{AUTHTESTCLIENT_BASE_API_URL}}api/Function1"
+        name: AuthTestClient
+        meta:
+          id: req_bfdde4ad1b6449e8894b185f762adb9b
+          created: 1754544513184
+          modified: 1754544620895
+          isPrivate: false
+          description: ""
+          sortKey: -1754501873896
+        method: GET
+        headers:
+          - name: User-Agent
+            value: insomnia/11.4.0
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+cookieJar:
+  name: Default Jar
+  meta:
+    id: jar_99d30891da4bdcebc63947a8fc17f076de878684
+    created: 1754461035751
+    modified: 1754461035751
+environments:
+  name: local
+  meta:
+    id: env_99d30891da4bdcebc63947a8fc17f076de878684
+    created: 1754461035587
+    modified: 1754461237740
+    isPrivate: false
+  data:
+    "": ""
+  subEnvironments:
+    - name: local
+      meta:
+        id: env_1838c60be82d4da4925c63a1b51c6a43
+        created: 1754461259010
+        modified: 1754544543224
+        isPrivate: true
+        sortKey: 1754461259010
+      data:
+        HBGATEWAY_BASE_API_URL: " http://localhost:7115/"
+        DAILY_BASE_API_URL: http://localhost:7069/
+        MATCHING_BASE_API_URL: http://localhost:7249/
+        AUTHTESTSERVER_BASE_API_URL: http://localhost:7267/
+        AUTHTESTCLIENT_BASE_API_URL: http://localhost:7267/
+    - name: dev
+      meta:
+        id: env_a5b55cf33b0a44059b227a521dea2e9d
+        created: 1754461267120
+        modified: 1754544590294
+        isPrivate: true
+        sortKey: 1754461267120
+      data:
+        HBGATEWAY_BASE_API_URL: https://aue-dev-func-hbgateway.aue-dev-ase-int.appserviceenvironment.net/
+        DAILY_BASE_API_URL: https://aue-dev-func-dailyfile.aue-dev-ase-int.appserviceenvironment.net/
+        MATCHING_BASE_API_URL: https://aue-dev-func-matching.aue-dev-ase-int.appserviceenvironment.net/
+        AUTHTESTSERVER_BASE_API_URL: https://authtestserver-hsgbf2b3aehadjbq.australiaeast-01.azurewebsites.net/
+        AUTHTESTCLIENT_BASE_API_URL: https://authtestclient-dwgzhkavgqbzg0cc.australiaeast-01.azurewebsites.net/
