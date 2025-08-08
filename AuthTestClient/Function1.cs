@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
+using System.Net.Http.Headers;
 
 namespace AuthTestClient;
 
@@ -36,14 +37,11 @@ public class Function1
         var baseUrl = configuration.GetValue<string>("AUTHTESTSERVER_BASE_URL")!;
         _logger.LogInformation("Calling through to {BaseUrl}", baseUrl);
         var client = new HttpClient();
+        client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
         var request = new HttpRequestMessage
         {
             Method = HttpMethod.Get,
-            RequestUri = new Uri($"{baseUrl}api/Function1"),
-            Headers =
-            {
-                { "Authorization", $"Bearer ${token}" }
-            }
+            RequestUri = new Uri($"{baseUrl}api/Function1")
         };
 
         using var response = await client.SendAsync(request);
