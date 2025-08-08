@@ -15,5 +15,6 @@
     <PackageVersion Include="Serilog.Extensions.Logging" Version="8.0.0" />
     <PackageVersion Include="Serilog.Sinks.ApplicationInsights" Version="4.0.0" />
     <PackageVersion Include="Serilog.Sinks.Console" Version="6.0.0" />
+	<PackageVersion Include="Azure.Identity" Version="1.14.2" />
   </ItemGroup>
 </Project>

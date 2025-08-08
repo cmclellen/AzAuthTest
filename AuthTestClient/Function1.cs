@@ -25,7 +25,7 @@ public class Function1
         _logger.LogInformation("Running...");
         var response = await CallApi();
 
-        _logger.LogInformation("Craig says....C# HTTP trigger function processed a request.");
+        _logger.LogInformation("Craig says....{ResponseBody}", response);
         return new OkObjectResult("Welcome to client1; " + response);
     }
 
@@ -49,7 +49,6 @@ public class Function1
         using var response = await client.SendAsync(request);
         response.EnsureSuccessStatusCode();
         var body = await response.Content.ReadAsStringAsync();
-        Console.WriteLine(body);
         return body;
     }
 
@@ -57,11 +56,21 @@ public class Function1
     {
         _logger.LogInformation("Obtaining token...");
 
-        ManagedIdentityCredential miCredential = new();
-        var token = await miCredential.GetTokenAsync(GetTokenRequestContext());
+        DefaultAzureCredential credential = new();
+        var token = await credential.GetTokenAsync(GetTokenRequestContext());
         _logger.LogInformation("Token obtained {Token}", token.Token);
         return token.Token;
     }
+
+    //private async Task<string> GetToken1()
+    //{
+    //    _logger.LogInformation("Obtaining token...");
+
+    //    ManagedIdentityCredential miCredential = new();
+    //    var token = await miCredential.GetTokenAsync(GetTokenRequestContext());
+    //    _logger.LogInformation("Token obtained {Token}", token.Token);
+    //    return token.Token;
+    //}
 
     //private TokenRequestContext GetTokenRequestContext()
     //{
@@ -73,9 +82,8 @@ public class Function1
     private TokenRequestContext GetTokenRequestContext()
     {
         try
-        {
-            var miAudience = configuration.GetValue<string>("MI_AUDIENCE")!;
-            var tokenRequestContextUri = $"{miAudience}/.default";
+        {   
+            var tokenRequestContextUri = configuration.GetValue<string>("MI_AUDIENCE")!;
             _logger.LogInformation("Constructed token request context [{TokenRequestContextUri}]", tokenRequestContextUri);
             TokenRequestContext tokenRequestContext = new([tokenRequestContextUri]);
             return tokenRequestContext;
