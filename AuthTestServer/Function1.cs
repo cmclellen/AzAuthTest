@@ -19,21 +19,26 @@ public class Function1
         _logger = logger;
     }
 
-    [Authorize]
+    [Authorize(Roles = "Task.Write")]
     [Function("Function1")]
     public IActionResult Run([HttpTrigger(AuthorizationLevel.Anonymous, "get", "post")] HttpRequest req)
     {
         _logger.LogInformation("C# HTTP trigger function processed a request {UserIsNull}.", req.HttpContext.User == null);
 
-        var claims = req.HttpContext.User?.Claims ?? [];
+        var user = req.HttpContext.User;
+        var claims = user?.Claims ?? [];
 
-        _logger.LogInformation("Claim count: {ClaimCount}", claims.Count());
+        _logger.LogInformation("Claim count: {ClaimCount}; {IsInTaskWriterRole}", claims.Count(), user?.IsInRole("Task.Write"));
         
         foreach (Claim claim in claims)
         {
-            _logger.LogInformation($"CLAIM TYPE: {claim.Type}; CLAIM VALUE: {claim.Value}");
+            var isRoleClaim = claim.Type.EndsWith("/identity/claims/role");
+            if (isRoleClaim)
+            {
+                _logger.LogInformation($"CLAIM TYPE: {claim.Type}; CLAIM VALUE: {claim.Value}");
+            }
         }
-        
+
         return new OkObjectResult("Welcome to server1");
     }
 }
