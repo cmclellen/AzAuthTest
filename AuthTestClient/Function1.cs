@@ -12,12 +12,14 @@ namespace AuthTestClient;
 public class Function1
 {
     private readonly ILogger<Function1> _logger;
-    private readonly IConfiguration configuration;
+    private readonly IConfiguration _configuration;
+    private readonly TokenAcquirer _tokenAcquirer;
 
-    public Function1(ILogger<Function1> logger, IConfiguration configuration)
+    public Function1(ILogger<Function1> logger, IConfiguration configuration, TokenAcquirer tokenAcquirer)
     {
         _logger = logger;
-        this.configuration = configuration;
+        _configuration = configuration;
+        _tokenAcquirer = tokenAcquirer;
     }
 
     [Function("Function1")]
@@ -32,9 +34,20 @@ public class Function1
 
     private async Task<string> CallApi()
     {
-        var token = await GetToken();
+        var msiEndpoint = _configuration.GetValue<string>("MSI_ENDPOINT")!;
+        _logger.LogInformation("MSI_ENDPOINT set to [{MsiEndpoint}]", msiEndpoint);
 
-        var baseUrl = configuration.GetValue<string>("AUTHTESTSERVER_BASE_URL")!;
+        var token = await _tokenAcquirer.GetTokenAsync();
+
+        var body = await DoTheRest(token);
+        //var body = "short circuited";
+
+        return body;
+    }
+
+    private async Task<string> DoTheRest(string token)
+    {
+        var baseUrl = _configuration.GetValue<string>("AUTHTESTSERVER_BASE_URL")!;
         _logger.LogInformation("Calling through to {BaseUrl}", baseUrl);
         var client = new HttpClient();
         client.DefaultRequestHeaders.CacheControl = CacheControlHeaderValue.Parse("no-cache");
@@ -49,49 +62,5 @@ public class Function1
         response.EnsureSuccessStatusCode();
         var body = await response.Content.ReadAsStringAsync();
         return body;
-    }
-
-    private async Task<string> GetToken()
-    {
-        _logger.LogInformation("Obtaining token...");
-
-        //DefaultAzureCredential credential = new();
-        ManagedIdentityCredential credential = new();
-        var token = await credential.GetTokenAsync(GetTokenRequestContext());
-        _logger.LogInformation("Token obtained {Token}", token.Token);
-        return token.Token;
-    }
-
-    //private async Task<string> GetToken1()
-    //{
-    //    _logger.LogInformation("Obtaining token...");
-
-    //    ManagedIdentityCredential miCredential = new();
-    //    var token = await miCredential.GetTokenAsync(GetTokenRequestContext());
-    //    _logger.LogInformation("Token obtained {Token}", token.Token);
-    //    return token.Token;
-    //}
-
-    //private TokenRequestContext GetTokenRequestContext()
-    //{
-    //    var miAudience = "api://AzureADTokenExchange";
-    //    TokenRequestContext tokenRequestContext = new([$"{miAudience}/.default"]);
-    //    return tokenRequestContext;
-    //}
-
-    private TokenRequestContext GetTokenRequestContext()
-    {
-        try
-        {   
-            var tokenRequestContextUri = configuration.GetValue<string>("MI_AUDIENCE")!;
-            _logger.LogInformation("Constructed token request context [{TokenRequestContextUri}]", tokenRequestContextUri);
-            TokenRequestContext tokenRequestContext = new([tokenRequestContextUri]);
-            return tokenRequestContext;
-        }
-        catch (Exception e)
-        {
-            _logger.LogError(e, "Failed obtaining access token.");
-            throw;
-        }
     }
 }
